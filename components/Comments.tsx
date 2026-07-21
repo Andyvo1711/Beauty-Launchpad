@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { SEED_COMMENTS } from "@/lib/seedComments";
 
 interface Comment {
   name: string;
@@ -9,50 +8,61 @@ interface Comment {
   date: string;
 }
 
-function storageKey(slug: string) {
-  return `beauty-launchpad:comments:${slug}`;
-}
-
 export default function Comments({ slug }: { slug: string }) {
-  const seedComments = SEED_COMMENTS[slug] ?? [];
-  const [userComments, setUserComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const [loaded, setLoaded] = useState(false);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+    "loading"
+  );
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(storageKey(slug));
-      setUserComments(raw ? (JSON.parse(raw) as Comment[]) : []);
-    } catch {
-      setUserComments([]);
-    }
-    setLoaded(true);
+    let cancelled = false;
+
+    fetch(`/api/comments?slug=${encodeURIComponent(slug)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load comments");
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setComments(data.comments ?? []);
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
-  const comments = [...seedComments, ...userComments];
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmedName = name.trim();
     const trimmedText = text.trim();
-    if (!trimmedName || !trimmedText) return;
+    if (!trimmedName || !trimmedText || submitting) return;
 
-    const next = [
-      ...userComments,
-      {
-        name: trimmedName,
-        text: trimmedText,
-        date: new Date().toISOString(),
-      },
-    ];
-    setUserComments(next);
-    window.localStorage.setItem(storageKey(slug), JSON.stringify(next));
-    setName("");
-    setText("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, name: trimmedName, text: trimmedText }),
+      });
+      if (!res.ok) throw new Error("Failed to post comment");
+      const data = await res.json();
+      setComments((prev) => [...prev, data.comment]);
+      setName("");
+      setText("");
+    } catch {
+      // Leave the form filled in so the visitor can retry.
+    } finally {
+      setSubmitting(false);
+    }
   }
-
-  if (!loaded) return null;
 
   return (
     <section className="mt-16 border-t border-rose-200 pt-10">
@@ -60,11 +70,21 @@ export default function Comments({ slug }: { slug: string }) {
         Comments {comments.length > 0 && `(${comments.length})`}
       </h2>
 
-      {comments.length === 0 ? (
+      {status === "loading" && (
+        <p className="text-sm text-ink-500">Loading comments...</p>
+      )}
+      {status === "error" && (
+        <p className="text-sm text-ink-500">
+          Couldn&apos;t load comments right now. Try refreshing the page.
+        </p>
+      )}
+      {status === "ready" && comments.length === 0 && (
         <p className="text-sm text-ink-500">
           No comments yet — be the first to share your thoughts.
         </p>
-      ) : (
+      )}
+
+      {comments.length > 0 && (
         <ul className="space-y-4">
           {comments.map((comment, index) => (
             <li
@@ -96,8 +116,7 @@ export default function Comments({ slug }: { slug: string }) {
         className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-4 sm:p-5"
       >
         <p className="mb-3 text-xs text-ink-500">
-          Comments are saved to your own browser only and aren&apos;t visible
-          to other visitors.
+          Comments are public and visible to everyone.
         </p>
         <input
           type="text"
@@ -119,9 +138,10 @@ export default function Comments({ slug }: { slug: string }) {
         />
         <button
           type="submit"
-          className="mt-3 rounded-full bg-rose-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-rose-700"
+          disabled={submitting}
+          className="mt-3 rounded-full bg-rose-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-rose-700 disabled:opacity-60"
         >
-          Post Comment
+          {submitting ? "Posting..." : "Post Comment"}
         </button>
       </form>
     </section>
