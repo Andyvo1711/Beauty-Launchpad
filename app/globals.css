@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff7f9;
+  --foreground: #2b1c22;
+
+  --color-rose-50: #fff1f4;
+  --color-rose-100: #ffe1e8;
+  --color-rose-200: #ffc2d1;
+  --color-rose-300: #ff9bb3;
+  --color-rose-400: #fb6f93;
+  --color-rose-500: #f04771;
+  --color-rose-600: #d42b57;
+  --color-rose-700: #ac1f45;
+  --color-rose-800: #8a1d3c;
+  --color-rose-900: #731b36;
+
+  --color-ink-50: #f6f4f5;
+  --color-ink-100: #e7e2e4;
+  --color-ink-200: #cbc0c5;
+  --color-ink-300: #a8949c;
+  --color-ink-400: #7d6570;
+  --color-ink-500: #5c4650;
+  --color-ink-600: #45333c;
+  --color-ink-700: #35262d;
+  --color-ink-800: #271b20;
+  --color-ink-900: #1a1216;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-heading);
+
+  --color-rose-50: var(--color-rose-50);
+  --color-rose-100: var(--color-rose-100);
+  --color-rose-200: var(--color-rose-200);
+  --color-rose-300: var(--color-rose-300);
+  --color-rose-400: var(--color-rose-400);
+  --color-rose-500: var(--color-rose-500);
+  --color-rose-600: var(--color-rose-600);
+  --color-rose-700: var(--color-rose-700);
+  --color-rose-800: var(--color-rose-800);
+  --color-rose-900: var(--color-rose-900);
+
+  --color-ink-50: var(--color-ink-50);
+  --color-ink-100: var(--color-ink-100);
+  --color-ink-200: var(--color-ink-200);
+  --color-ink-300: var(--color-ink-300);
+  --color-ink-400: var(--color-ink-400);
+  --color-ink-500: var(--color-ink-500);
+  --color-ink-600: var(--color-ink-600);
+  --color-ink-700: var(--color-ink-700);
+  --color-ink-800: var(--color-ink-800);
+  --color-ink-900: var(--color-ink-900);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+}
