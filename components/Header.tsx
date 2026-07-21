@@ -12,12 +12,20 @@ export default function Header() {
             Nail & Beauty, USA
           </span>
         </Link>
-        <a
-          href="#salon-tips"
-          className="whitespace-nowrap rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-rose-700"
-        >
-          Salon Safety Tips
-        </a>
+        <nav className="flex items-center gap-4">
+          <Link
+            href="/articles"
+            className="text-sm font-semibold text-ink-800 transition-colors hover:text-rose-700"
+          >
+            Articles
+          </Link>
+          <a
+            href="/#salon-tips"
+            className="whitespace-nowrap rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-rose-700"
+          >
+            Salon Safety Tips
+          </a>
+        </nav>
       </div>
     </header>
   );

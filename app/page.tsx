@@ -1,4 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
+import ArticleCard from "@/components/ArticleCard";
+import { getAllArticles } from "@/lib/content";
 
 const STATS = [
   {
@@ -52,6 +55,8 @@ const SAFETY_TIPS = [
 ];
 
 export default function HomePage() {
+  const latestArticles = getAllArticles().slice(0, 3);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <div className="relative flex min-h-[320px] w-full flex-col justify-end overflow-hidden rounded-2xl shadow-lg sm:min-h-[400px]">
@@ -125,6 +130,27 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {latestArticles.length > 0 && (
+        <section className="mt-14">
+          <div className="mb-5 flex items-end justify-between">
+            <h2 className="font-serif text-2xl font-bold text-ink-900">
+              Latest Articles
+            </h2>
+            <Link
+              href="/articles"
+              className="whitespace-nowrap text-sm font-semibold text-rose-700 hover:text-rose-800"
+            >
+              View all &rarr;
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {latestArticles.map((article) => (
+              <ArticleCard key={article.slug} article={article} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section
         id="salon-tips"
