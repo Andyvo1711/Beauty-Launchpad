@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import ArticleCard from "@/components/ArticleCard";
+import Comments from "@/components/Comments";
 import {
   getAllSlugs,
   getArticleBySlug,
@@ -79,6 +80,8 @@ export default async function ArticlePage({
         className="mt-8 max-w-none text-[17px] leading-relaxed text-ink-800 [&>h2]:mt-8 [&>h2]:mb-3 [&>h2]:font-serif [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-ink-900 [&>p]:mb-5"
         dangerouslySetInnerHTML={{ __html: article.contentHtml }}
       />
+
+      <Comments slug={article.slug} />
 
       {related.length > 0 && (
         <section className="mt-16 border-t border-rose-200 pt-10">
