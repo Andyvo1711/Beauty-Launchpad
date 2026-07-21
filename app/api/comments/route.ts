@@ -77,23 +77,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ comment: rows[0] });
 }
-
-export async function DELETE(request: NextRequest) {
-  const body = await request.json().catch(() => null);
-  const slug = typeof body?.slug === "string" ? body.slug : "";
-  const name = typeof body?.name === "string" ? body.name : "";
-  const text = typeof body?.text === "string" ? body.text : "";
-
-  if (!slug || !name || !text) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-
-  await ensureTable();
-
-  const { rowCount } = await sql`
-    DELETE FROM comments
-    WHERE slug = ${slug} AND name = ${name} AND body = ${text};
-  `;
-
-  return NextResponse.json({ deleted: rowCount });
-}
