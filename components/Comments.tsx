@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { SEED_COMMENTS } from "@/lib/seedComments";
 
 interface Comment {
   name: string;
@@ -13,7 +14,8 @@ function storageKey(slug: string) {
 }
 
 export default function Comments({ slug }: { slug: string }) {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const seedComments = SEED_COMMENTS[slug] ?? [];
+  const [userComments, setUserComments] = useState<Comment[]>([]);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -21,12 +23,14 @@ export default function Comments({ slug }: { slug: string }) {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(storageKey(slug));
-      setComments(raw ? (JSON.parse(raw) as Comment[]) : []);
+      setUserComments(raw ? (JSON.parse(raw) as Comment[]) : []);
     } catch {
-      setComments([]);
+      setUserComments([]);
     }
     setLoaded(true);
   }, [slug]);
+
+  const comments = [...seedComments, ...userComments];
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,14 +39,14 @@ export default function Comments({ slug }: { slug: string }) {
     if (!trimmedName || !trimmedText) return;
 
     const next = [
-      ...comments,
+      ...userComments,
       {
         name: trimmedName,
         text: trimmedText,
         date: new Date().toISOString(),
       },
     ];
-    setComments(next);
+    setUserComments(next);
     window.localStorage.setItem(storageKey(slug), JSON.stringify(next));
     setName("");
     setText("");
